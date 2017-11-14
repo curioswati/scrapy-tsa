@@ -31,7 +31,7 @@ SECRET_KEY = '5uzaloz%%^*2l*_5d*3xpx&7@gsiqp+k606t4&n0t8gzjtf-if'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS =  ['127.0.0.1', 'localhost', 'scrapy-tsa.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'scrapy-tsa.com']
 
 
 # Application definition
@@ -109,3 +109,10 @@ USE_TZ = True
 # TEMPLATE_DIRS = (BASE_DIR.child('templates'),)
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = (BASE_DIR.child('static'),)
+
+CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY')
+CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
+ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
+ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
+
+TWITTER_API_URL = 'https://api.twitter.com/1.1/search/tweets.json?'
