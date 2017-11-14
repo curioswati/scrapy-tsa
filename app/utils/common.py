@@ -1,6 +1,8 @@
+import pickle
 import re
+import sys
 
-from utils import pre_processor
+from utils import classifier, pre_processor
 
 
 def get_stop_wordlist(stop_word_list_filename):
@@ -119,3 +121,29 @@ def get_SVM_feature_vector(feature_list, tweets):
 
 def is_ascii(word):
     return all(ord(c) < 128 for c in word)
+
+
+def train_model(test_tweets_file):
+    '''
+    This function trains the svm classifier using the training data.
+    '''
+    # get tweets from file
+    tweets_file = open(test_tweets_file)
+    tweets = pickle.load(tweets_file)
+    tweets_file.close()
+
+    training_datafile = 'app/data/full_training_dataset.csv'
+    classifier_dumpfile = 'app/data/svm_trained_model.pickle'
+    training_required = 1
+    keyword = 'scrapy'
+    time = 'lastweek'
+
+    sys.stdout.flush()
+    sc = classifier.SVMClassifier(tweets, keyword, time, training_datafile,
+                                  classifier_dumpfile, training_required)
+    print 'Computing Accuracy'
+    sys.stdout.flush()
+    sc.classify()
+    sc.accuracy()
+    print 'Done'
+    sys.stdout.flush()
