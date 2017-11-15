@@ -1,4 +1,4 @@
-from utils import common
+from utils import classifier, twitter_api
 
 # Read the tweets one by one and process it
 # inp_tweets = csv.reader(open('app/data/sampleTweets.csv', 'rb'), delimiter=',', quotechar='|')
@@ -13,7 +13,7 @@ feature_list = []
 # for row in inp_tweets:
 #     sentiment = row[0]
 #     tweet = row[1]
-#     processed_tweet = pre_processor.process_tweet(tweet)
+#     processed_tweet = common.process_tweet(tweet)
 #     feature_vector = common.get_feature_vector(processed_tweet, stop_words)
 #     feature_list.extend(feature_vector)
 #     tweets.append((feature_vector, sentiment))

@@ -1,17 +1,15 @@
 import csv
+import pickle
+import sys
 
-# import svm
 from libsvm.svmutil import (LINEAR, svm_load_model, svm_parameter, svm_predict,
                             svm_problem, svm_save_model, svm_train)
-# import os
-# import pickle
-# import re
-from utils import common, pre_processor
+from utils import common, helper
 
 
 class SVMClassifier():
     """ SVM Classifier """
-    def __init__(self, data, keyword, time, training_datafile,
+    def __init__(self, data, keyword, training_datafile,
                  classifier_dumpfile, training_required=0):
 
         self.feature_list = open('app/data/feature_list.txt').readlines()
@@ -25,9 +23,7 @@ class SVMClassifier():
         self.neg_count = [0] * self.len_tweets
         self.training_datafile = training_datafile
 
-        self.time = time
         self.keyword = keyword
-        # self.html = html_helper.HTMLHelper()
 
         # call training model
         if(training_required):
@@ -57,7 +53,7 @@ class SVMClassifier():
             d = data[i]
             tw = []
             for t in d:
-                tw.append(pre_processor.process_tweet(t))
+                tw.append(common.process_tweet(t))
             tweets[i] = tw
         return tweets
 
@@ -70,7 +66,7 @@ class SVMClassifier():
             words_filtered = [e.lower() for e in words.split() if(common.is_ascii(e))]
             tweets.append((words_filtered, sentiment))
 
-        results = common.get_SVM_feature_vector_and_labels(self.feature_list, tweets)
+        results = helper.get_SVM_feature_vector_and_labels(self.feature_list, tweets)
         self.feature_vectors = results['feature_vector']
         self.labels = results['labels']
 
@@ -93,7 +89,7 @@ class SVMClassifier():
         tweetItems = []
         count = 1
         for row in reader:
-            processed_tweet = pre_processor.process_tweet(row[1])
+            processed_tweet = common.process_tweet(row[1])
             sentiment = row[0]
 
             if(sentiment == 'neutral'):
@@ -136,7 +132,7 @@ class SVMClassifier():
             for words in tw:
                 words_filtered = [e.lower() for e in words.split() if(common.is_ascii(e))]
                 test_tweets.append(words_filtered)
-            test_feature_vector = common.get_SVM_feature_vector(test_tweets)
+            test_feature_vector = helper.get_SVM_feature_vector(self.feature_list, test_tweets)
             p_labels, p_accs, p_vals = svm_predict([0] * len(test_feature_vector),
                                                    test_feature_vector, self.classifier)
             count = 0
@@ -174,7 +170,7 @@ class SVMClassifier():
             words_filtered = [e.lower() for e in t.split() if(common.is_ascii(e))]
             test_tweets.append(words_filtered)
 
-        test_feature_vector = common.get_SVM_feature_vector(self.feature_list, test_tweets)
+        test_feature_vector = helper.get_SVM_feature_vector(self.feature_list, test_tweets)
         p_labels, p_accs, p_vals = svm_predict([0] * len(test_feature_vector),
                                                test_feature_vector, self.classifier)
         count = 0
@@ -199,6 +195,26 @@ class SVMClassifier():
         print 'Total = {}, Correct = {}, Wrong = {}, Accuracy = {}'.format(
             total, correct, wrong, self.accuracy)
 
-    def get_HTML(self):
-        return self.html.get_result_HTML(self.keyword, self.results, self.time, self.pos_count,
-                                         self.neg_count, self.neut_count, 'svm')
+    def train_model(test_tweets_file):
+        '''
+        This function trains the svm classifier using the training data.
+        '''
+        # get tweets from file
+        tweets_file = open(test_tweets_file)
+        tweets = pickle.load(tweets_file)
+        tweets_file.close()
+
+        training_datafile = 'app/data/full_training_dataset.csv'
+        classifier_dumpfile = 'app/data/svm_trained_model.pickle'
+        training_required = 1
+        keyword = 'scrapy'
+
+        sys.stdout.flush()
+        sc = SVMClassifier(tweets, keyword, training_datafile,
+                           classifier_dumpfile, training_required)
+        print 'Computing Accuracy'
+        sys.stdout.flush()
+        sc.classify()
+        sc.accuracy()
+        print 'Done'
+        sys.stdout.flush()

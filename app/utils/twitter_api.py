@@ -53,7 +53,25 @@ def get_tweets(keyword, params=None):
     return tweets
 
 
-def wrtite_to_csv(keyword, tweets):
+def get_twitter_data(keyword, time):
+    tweets = {}
+
+    if time == 'lastweek':
+        pass
+
+    elif time == 'today':
+        date_format = '%Y-%m-%d'
+        cur_date = datetime.today().date()
+        since_date = cur_date - timedelta(days=1)
+
+        for i in range(0, 1):
+            params = {'since': datetime.strftime(since_date, date_format),
+                      'until': datetime.strftime(cur_date, date_format)}
+            tweets[i] = get_tweets(keyword, params)
+    return tweets
+
+
+def write_to_csv(keyword, tweets):
     '''
     Save tweets in a csv file to load later.
     '''
