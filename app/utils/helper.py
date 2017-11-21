@@ -1,6 +1,6 @@
 import re
 
-from utils import common
+from app.utils import common
 
 
 def get_SVM_feature_vector(feature_list, tweets):

@@ -1,3 +1,5 @@
+import csv
+import nltk
 import re
 
 
@@ -64,3 +66,47 @@ def replace_two_or_more(s):
     '''
     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
     return pattern.sub(r"\1\1", s)
+
+
+def get_filtered_training_data(training_datafile):
+    fp = open(training_datafile, 'rb')
+
+    reader = csv.reader(fp, delimiter=',', quotechar='"', escapechar='\\')
+    tweetItems = []
+    for row in reader:
+        processed_tweet = process_tweet(row[1])
+        sentiment = row[0]
+
+        tweet_item = processed_tweet, sentiment
+        tweetItems.append(tweet_item)
+    return tweetItems
+
+
+def gen_features(training_datafile):
+    '''
+    Function to generate feature list from test data.
+    It is used only once and the features are saved in a file that can be later used.
+    '''
+    stop_words = get_stop_wordlist('app/data/stopwords.txt')
+    feature_list_file = open('app/data/feature_list.txt', 'w+')
+    tweet_items = get_filtered_training_data(training_datafile)
+
+    all_words = []
+    for (tweet, sentiment) in tweet_items:
+        tweet = process_tweet(tweet)
+        words_filtered = [e.lower() for e in tweet.split() if(is_ascii(e))]
+
+        for word in words_filtered:
+            word = replace_two_or_more(word)
+            word = word.strip('\'"?,.')
+            val = re.search(r"^[a-zA-Z][a-zA-Z0-9]*[a-zA-Z]+[a-zA-Z0-9]*$", word)
+            if(word in stop_words or val is None or len(word) < 3):
+                continue
+            else:
+                all_words.append(word)
+    freq_dist = nltk.FreqDist(all_words)
+    word_features = sorted(freq_dist.items(), key=lambda x: x[1], reverse=True)
+    for word, freq in word_features:
+        feature_list_file.write('{}\n'.format(word))
+
+    feature_list_file.close()
