@@ -23,14 +23,6 @@ def get_stop_wordlist(stop_word_list_filename):
     return stop_words
 
 
-def extract_features(feature_list, tweet):
-    tweet_words = set(tweet)
-    features = {}
-    for word in feature_list:
-        features['contains(%s)' % word] = (word in tweet_words)
-    return features
-
-
 def is_ascii(word):
     return all(ord(c) < 128 for c in word)
 
