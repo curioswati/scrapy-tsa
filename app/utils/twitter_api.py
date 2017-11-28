@@ -177,3 +177,11 @@ def write_to_json(keyword, tweets):
     # write the json
     with open(file_name, 'wb') as f:
         json.dump(outtweets, f)
+
+
+def get_sentiments(tweets_data):
+    training_datafile = 'app/data/training.csv'
+    svm_classifier_dumpfile = 'app/data/svm_trained_model.pickle'
+    sc = SVMClassifier(training_datafile, svm_classifier_dumpfile)
+    results = sc.classify(tweets_data)
+    return results

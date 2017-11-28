@@ -1,4 +1,5 @@
 {% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,19 +21,13 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
 
-    <!-- Plugin CSS -->
-    <link href="static/magnific-popup/magnific-popup.css" rel="stylesheet">
+    <!-- Plugin CSS >
+    <link href="static/magnific-popup/magnific-popup.css" rel="stylesheet"-->
 
     <!-- Theme CSS -->
     <link href="static/css/creative.min.css" rel="stylesheet">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-{% block css %} {% endblock %}
+    {% block css %} {% endblock %}
 </head>
 
 <body id="page-top">
@@ -44,7 +39,7 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand page-scroll" href="#page-top">Twitter Sent</a>
+                <a class="navbar-brand page-scroll" href="#page-top">Scrapy TSA</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -63,25 +58,7 @@
         <!-- /.container-fluid -->
     </nav>
 
-    <header>
-        <div class="header-content">
-            <div class="header-content-inner">
-                <!-- <h1 id="homeHeading">Your Favorite Source of Analysing your Tweets</h1> -->
-                <h1 id="homeHeading">Let's see your twitter mood!</h1>
-                <hr>
-                <p>Twitter Sent can help you find the happiness quotient of your tweets!</p>
-                <!-- <a href="#about" class="btn btn-primary btn-xl page-scroll">Find Out More</a> -->
-                <form role="form" action="/get_mood" method="POST">
-                    <div class="input-group">
-                                <input type="text" name="screen_name" class="form-control"Enttwitter handler">
-                        <span class="input-group-btn">
-                            <button class="btn btn-warning" type="submit">Get Mood!</button>
-                        </span>
-                    </div><!-- /input-group -->
-                </form>
-            </div>
-        </div>
-    </header>
+    <header>{% block header %}{% endblock %} </header>
 
     <section class="bg-primary" id="about">
         <div class="container">
@@ -101,7 +78,7 @@
                 <div class="col-lg-8 col-lg-offset-2 text-center">
                     <h2 class="section-heading">Let's Get In Touch!</h2>
                     <hr class="primary">
-                    <p>Wanna get in touch? Just say hello! and tell us what's your twitter mood today.</p>
+                    <p>Wanna get in touch? Just drop in and say hello!</p>
                 </div>
                 <div class="col-lg-4 text-center">
                     <i class="fa fa-envelope-o fa-3x sr-contact"></i>
@@ -117,13 +94,15 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="static/bootstrap/js/bootstrap.min.js"></script>
 
-    <!-- Plugin JavaScript -->
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <!-- Plugin JavaScript >
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script-->
     <script src="static/scrollreveal/scrollreveal.min.js"></script>
     <script src="static/magnific-popup/jquery.magnific-popup.min.js"></script>
 
     <!-- Theme JavaScript -->
     <script src="static/js/creative.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    {% block js %} {% endblock %}
 
 </body>
 

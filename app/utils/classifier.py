@@ -212,33 +212,26 @@ class NBClassifier(BaseClassifier):
         return classifier
 
     def classify(self, data):
-        len_tweets = len(data)
         results = {}
 
-        neut_count = [0] * len_tweets
-        pos_count = [0] * len_tweets
-        neg_count = [0] * len_tweets
+        pos_count = neg_count = neut_count = 0
 
         orig_tweets = self.get_uniq_data(data)
         tweets_data = self.get_processed_tweets(orig_tweets)
 
-        for i in tweets_data:
-            tweets = tweets_data[i]
-            count = 0
-            res = {}
+        for date in tweets_data:
+            tweets = tweets_data[date]
             for tweet in tweets:
                 label = self.classifier.classify(self.extract_features(tweet.split()))
 
                 if label == 'positive':
-                    pos_count[i] += 1
+                    pos_count += 1
                 elif label == 'negative':
-                    neg_count[i] += 1
+                    neg_count += 1
                 elif label == 'neutral':
-                    neut_count[i] += 1
-                result = {'text': tweet, 'tweet': orig_tweets[i][count], 'label': label}
-                res[count] = result
-                count += 1
-            results[i] = res
+                    neut_count += 1
+            results[date] = [pos_count, neg_count, neut_count]
+            pos_count = neg_count = neut_count = 0
         return results
 
     def accuracy(self):
