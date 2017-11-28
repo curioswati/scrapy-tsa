@@ -130,21 +130,16 @@ def get_twitter_data(keyword, from_date, to_date):
     to_date = datetime.strptime(to_date, date_format)
 
     cur_date = from_date
-    tweets = {}
+    tweets_data = {}
 
     while cur_date <= to_date:
         date_str = datetime.strftime(cur_date, date_format)
-        file_name = 'app/data/tweets_{}.txt'.format(date_str)
+        tweets = Tweet.objects.filter(created_at=cur_date).values_list('text', 'sentiment__name')
 
-        if os.path.isfile(file_name):
-            with open(file_name) as day_tweet_file:
-                tweets[date_str] = day_tweet_file.readlines()
+        if tweets:
+            tweets_data[date_str] = tweets
             cur_date += day_diff
-        else:
-            tweet_bundle = get_bundled_tweets(keyword, cur_date, to_date)
-            tweets.update(tweet_bundle)
-            break
-    return tweets
+    return tweets_data
 
 
 def write_to_csv(keyword, tweets):
@@ -181,7 +176,7 @@ def write_to_json(keyword, tweets):
 
 def get_sentiments(tweets_data):
     training_datafile = 'app/data/training.csv'
-    svm_classifier_dumpfile = 'app/data/svm_trained_model.pickle'
-    sc = SVMClassifier(training_datafile, svm_classifier_dumpfile)
-    results = sc.classify(tweets_data)
+    nb_classifier_dumpfile = 'app/data/naivebayes_trained_model.pickle'
+    nbc = NBClassifier(training_datafile, nb_classifier_dumpfile)
+    results = nbc.classify(tweets_data)
     return results
