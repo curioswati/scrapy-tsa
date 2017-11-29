@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).ancestor(3)
 print(BASE_DIR)
 
-MEDIA_ROOT = BASE_DIR.child('img')
+MEDIA_ROOT = BASE_DIR.child('media')
 
 STATIC_ROOT = BASE_DIR.child('static')
 

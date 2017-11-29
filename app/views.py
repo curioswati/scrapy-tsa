@@ -43,11 +43,9 @@ def result(request):
         to_date = datetime.today().date()
         from_date = to_date - date_diff
 
-        # tweets = twitter_api.get_twitter_data(keyword, from_date, to_date)
-        tweets = [1]
-        # status = 1
+        tweets = twitter_api.get_twitter_data(keyword, from_date, to_date)
         if len(tweets) > 0:
-            # results = twitter_api.get_sentiments(tweets)
+            results = twitter_api.get_sentiments(tweets)
             # [neg, neut, pos]
             results = [['d1', 3, 3, 5], ['d2', 2, 7, 7],
                        ['d3', 4, 2, 4], ['d4', 2, 5, 4],

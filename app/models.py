@@ -3,22 +3,28 @@ from django.db import models
 # Create your models here.
 
 
-class Usermodel(models.Model):
-    username = models.CharField(max_length=20, primary_key=True)
-    userpic = models.URLField(max_length=80)
-    name = models.CharField(max_length=30)
+class Tweet(models.Model):
+    tweet_id = models.CharField(max_length=30)
+    text = models.CharField(max_length=140)
+    created_at = models.DateField()
+    sentiment = models.ForeignKey('Sentiment', null=True, on_delete=models.SET_NULL)
+    sent_accuracy = models.FloatField()
 
     def __str__(self):
-        return str(self.name + "with twitter handle @" + str(self.username) )
+        return self.text
 
 
-class twitter(models.Model):
-    username = models.ForeignKey(Usermodel, on_delete=models.CASCADE)
-    date = models.DateField()
-    time = models.TimeField()
-    last_hq = models.FloatField()
-    last_tweet_id = models.CharField(max_length=20)
+class Sentiment(models.Model):
+    name = models.CharField(max_length=10)
 
     def __str__(self):
-        return str("@"+ self.username + " happiness quotient is " +
-                   str(self.last_hq) + "and last tweet id is " + str(self.last_tweet_id))
+        return self.name
+
+
+class DataFile(models.Model):
+    name = models.CharField(max_length=20)
+    file_type = models.CharField(max_length=10)
+    file_content = models.FileField(upload_to='files/')
+
+    def __str__(self):
+        return self.name
