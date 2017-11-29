@@ -1,11 +1,19 @@
+var data = $("#result").data().result;
+
+var get_dates = function() {
+    dates = [];
+    for (key in data) {
+        dates.push(data[key][0]);
+    }
+    return dates;
+}
 var n = 3, // The number of sentiments.
-    m = 7; // The number of days for which data is shown per series.
+    m = get_dates().length; // The number of days for which data is shown per series.
 
 // The xz array has m elements, representing the x-values shared by all series.
 // The yz array has n elements, representing the y-values of each of the n series.
 // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
 // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
-var data = $("#result").data().result;
 var xz = d3.range(m),
     yz = d3.range(n).map(
             function(i) {
@@ -53,13 +61,7 @@ rect.transition()
     .attr("y", function(d) { return y(d[1]); })
     .attr("height", function(d) { return y(d[0]) - y(d[1]); });
 
-var x_axis_data = function() {
-    dates = [];
-    for (key in data) {
-        dates.push(data[key][0]);
-    }
-    return dates;
-}();
+var x_axis_data = get_dates();
 var xAxis = d3.scaleBand()
     .domain(x_axis_data)
     .rangeRound([0, width])
