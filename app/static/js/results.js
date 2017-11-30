@@ -28,10 +28,12 @@ var xz = d3.range(m),
     y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
 
 var svg = d3.select("svg"),
-    margin = {top: 40, right: 10, bottom: 20, left: 20},
+    margin = {top: 50, right: 10, bottom: 20, left: 20},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g = svg.append("g").attr(
+            "transform", "translate(" + margin.top + "," + margin.left + ")"
+            );
 
 var x = d3.scaleBand()
     .domain(xz)
@@ -69,16 +71,19 @@ var xAxis = d3.scaleBand()
 
 var y_axis_data = function(yz) {
     y_values = [];
-    for (i=0; i<yz.length; i++) {
-        for (j=0; j<yz[i].length; j++) {
-        y_values.push(yz[i][j]);
+    for (i=0; i<yz[0].length; i++) {
+        var sum = 0;
+        for (j=0; j<yz.length; j++)
+        {
+            sum += yz[j][i];
         }
+        y_values.push(sum)
     }
     return y_values;
 }(yz);
 var yAxis = d3.scaleLinear()
-    .domain(y_axis_data)
-    .rangeRound([height, 0]);
+    .domain([Math.max.apply(Math, y_axis_data), 0])
+    .rangeRound([0, height]);
 
 g.append("g")
     .attr("class", "axis axis--x")
@@ -89,9 +94,25 @@ g.append("g")
 
 g.append("g")
     .attr("class", "axis axis--x")
+    .style("font-color", "white")
     .call(d3.axisLeft(yAxis)
         .tickSize(0)
         .tickPadding(6));
+
+svg.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width-250)
+    .attr("y", height + 55)
+    .text("Tweet Timeline (dates from past 30 days.)");
+
+svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("x", -20)
+    .attr("y", 15)
+    .attr("transform", "rotate(-90)")
+    .text("No. of Tweets (total of Positive, Neutral and Negative)");
 
 transitionStacked();
 

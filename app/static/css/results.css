@@ -13,7 +13,14 @@ svg {
   margin: 80px 20px;
 }
 
-.tick > text {
+.axis text {
     font-weight: bold;
-    color: white;
+    fill: white;
+}
+.axis line, .axis path {
+    stroke: white;
+}
+.label {
+    font-size: 16px;
+    fill: white;
 }
