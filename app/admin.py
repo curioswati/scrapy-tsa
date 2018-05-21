@@ -8,6 +8,7 @@ class TweetAdmin(admin.ModelAdmin):
         'text',
         'sentiment',
         'sent_accuracy',
+        'collected_at',
         'created_at')
 
 

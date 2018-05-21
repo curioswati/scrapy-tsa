@@ -1,130 +1,113 @@
-var data = $("#result").data().result;
+var data2 = {"name": "Tweet Timeline", "series": $("#result").data().result};
 
-var get_dates = function() {
-    dates = [];
-    for (key in data) {
-        dates.push(data[key][0]);
+var data = {"name": "xyz", "series":
+    [{"key": "Positive", "values": [
+        {"label": "2017-12-02", "value": "8"},
+        {"label": "2017-12-03", "value": "7"},
+        {"label": "2017-12-04", "value": "8"},
+        {"label": "2017-12-05", "value": "7"},
+        {"label": "2017-12-06", "value": "5"},
+        {"label": "2017-12-07", "value": "6"},
+        {"label": "2017-12-08", "value": "6"}]},
+    {"key": "Neutral", "values": [
+        {"label": "2017-12-02", "value": "9"},
+        {"label": "2017-12-03", "value": "9"},
+        {"label": "2017-12-04", "value": "5"},
+        {"label": "2017-12-05", "value": "8"},
+        {"label": "2017-12-06", "value": "7"},
+        {"label": "2017-12-07", "value": "8"},
+        {"label": "2017-12-08", "value": "9"}]
+    },
+    {"key": "Negative", "values": [
+        {"label": "2017-12-02", "value": "4"},
+        {"label": "2017-12-03", "value": "3"},
+        {"label": "2017-12-04", "value": "6"},
+        {"label": "2017-12-05", "value": "4"},
+        {"label": "2017-12-06", "value": "2"},
+        {"label": "2017-12-07", "value": "2"},
+        {"label": "2017-12-08", "value": "4"}]
     }
-    return dates;
+    ]
 }
-var n = 3, // The number of sentiments.
-    m = get_dates().length; // The number of days for which data is shown per series.
 
-// The xz array has m elements, representing the x-values shared by all series.
-// The yz array has n elements, representing the y-values of each of the n series.
-// Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
-// The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
-var xz = d3.range(m),
-    yz = d3.range(n).map(
-            function(i) {
-                var result = [];
-                for (key in data) {
-                    result.push(data[key][i+1]);
-                }
-                return result;
-            }),
-    y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)),
-    yMax = d3.max(yz, function(y) { return d3.max(y); }),
-    y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
+function drawChart(data) {
+    console.log(data);
+    nv.addGraph(function() {
+        var chartdata;
 
-var svg = d3.select("svg"),
-    margin = {top: 50, right: 10, bottom: 20, left: 20},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr(
-            "transform", "translate(" + margin.top + "," + margin.left + ")"
-            );
+        var maxValue = d3.max(data.series, function(d) {
+            return d3.max(d.values, function(d) {
+                return parseFloat(d.value);
+            })
+        });
+        var minValue = d3.min(data.series, function(d) {
+            return d3.min(d.values, function(d) {
+                return parseFloat(d.value);
+            })
+        });
 
-var x = d3.scaleBand()
-    .domain(xz)
-    .rangeRound([0, width])
-    .padding(0.00);
+        var chart = nv.models.multiBarChart()
+            .color(["#295949", "#FFA644", "#E53d36"])
+            // .x(function(d) {
+            //     return d.label
+            // })
+            .y(function(d) {
+                return parseFloat(d.value);
+            })
+            .reduceXTicks(false) //If 'false', every single x-axis tick label will be rendered.
+            .rotateLabels(0) //Angle to rotate x-axis labels.
+            .showControls(false) //Allow user to switch between 'Grouped' and 'Stacked' mode.
+            .stacked(true)
+            .groupSpacing(0.2); //Distance between each group of bars.
 
-var y = d3.scaleLinear()
-    .domain([0, y1Max])
-    .range([height, 0]);
+        chart.yAxis.ticks(10)
+            // .tickFormat(function(d) {
+            //     return formatAbbr(d)
+            // })
+            .axisLabel("Number of Tweets")
+            .axisLabelDistance(10)
+            .ticks(10);
 
-var color = [d3.rgb(255, 107, 107), d3.rgb(78, 205, 196), d3.rgb(199, 244, 100)]
-var series = g.selectAll(".series")
-  .data(y01z)
-  .enter().append("g")
-    .attr("fill", function(d, i) { return color[i]; });
+        chart.x(function(d) {
+            var format = d3.time.format("%Y-%m-%d");
+            return format.parse(d.label);
+        })
 
-var rect = series.selectAll("rect")
-  .data(function(d) { return d; })
-  .enter().append("rect")
-    .attr("x", function(d, i) { return x(i); })
-    .attr("y", height)
-    .attr("width", x.bandwidth())
-    .attr("height", 0);
+        chart.y(function(d) {
+            return parseFloat(d.value)
+        })
 
-rect.transition()
-    .delay(function(d, i) { return i * 10; })
-    .attr("y", function(d) { return y(d[1]); })
-    .attr("height", function(d) { return y(d[0]) - y(d[1]); });
+        // chart.tooltip.valueFormatter(function(d) {
+        //     return d3.format(",.f")(d);
+        // })
 
-var x_axis_data = get_dates();
-var xAxis = d3.scaleBand()
-    .domain(x_axis_data)
-    .rangeRound([0, width])
-    .padding(0.00);
-
-var y_axis_data = function(yz) {
-    y_values = [];
-    for (i=0; i<yz[0].length; i++) {
-        var sum = 0;
-        for (j=0; j<yz.length; j++)
-        {
-            sum += yz[j][i];
+        if (maxValue < 0) {
+            maxValue = 0;
         }
-        y_values.push(sum)
-    }
-    return y_values;
-}(yz);
-var yAxis = d3.scaleLinear()
-    .domain([Math.max.apply(Math, y_axis_data), 0])
-    .rangeRound([0, height]);
+        if (minValue > 0) {
+            minValue = 0;
+        }
+        chart.yAxis.scale().domain([minValue, maxValue]);
 
-g.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xAxis)
-        .tickSize(0)
-        .tickPadding(6));
+        chart.margin({ "left": 120, "right": 20, "top": 0, "bottom": 70 })
+        .width(700)
+        .noData("The record has no values in the budget document.")
+ 
+        chart.xAxis.axisLabel("Date")
+            .tickFormat(function (d) {
+                var format = d3.time.format("%Y");
+                return d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear();
+            })
+            .axisLabelDistance(20);
 
-g.append("g")
-    .attr("class", "axis axis--x")
-    .style("font-color", "white")
-    .call(d3.axisLeft(yAxis)
-        .tickSize(0)
-        .tickPadding(6));
+        chartdata = d3.select('header svg')
+            .datum(data.series)
+            .call(chart);
 
-svg.append("text")
-    .attr("class", "x label")
-    .attr("text-anchor", "end")
-    .attr("x", width-250)
-    .attr("y", height + 55)
-    .text("Tweet Timeline (dates from past 30 days.)");
+        chartdata.transition().duration(500).call(chart);
+        nv.utils.windowResize(chart.update);
 
-svg.append("text")
-    .attr("class", "y label")
-    .attr("text-anchor", "end")
-    .attr("x", -20)
-    .attr("y", 15)
-    .attr("transform", "rotate(-90)")
-    .text("No. of Tweets (total of Positive, Neutral and Negative)");
-
-transitionStacked();
-
-function transitionStacked() {
-  y.domain([0, y1Max]);
-
-  rect.transition()
-      .duration(500)
-      .delay(function(d, i) { return i * 10; })
-      .attr("y", function(d) { return y(d[1]); })
-      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-    .transition()
-      .attr("x", function(d, i) { return x(i); })
-      .attr("width", x.bandwidth());
+        return chart;
+    });
 }
+drawChart(data);

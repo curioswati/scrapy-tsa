@@ -9,10 +9,10 @@ requests.packages.urllib3.disable_warnings()
 
 
 #Twitter API credentials
-consumer_key = "GnWGpbL43E3C5h2sDPd2utGNE"
-consumer_secret = "6XQxuMSSuTCEkt0IzgrkkYdfYmMI5IedgObK842TByVWgCVR1A"
-access_key = "812626993-GfsSqnhbNyAJd2Sm6JOTmJAHOUKWKlBFXHkNt8ga"
-access_secret = "NIzDb0s1WG98oqcKlRM4m2iZxFqrjtqOLGxb8vknpzldj"
+consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
+consumer_secret = os.environ.get('TWITTER_CONSUMER_SECRET')
+access_key = os.environ.get('TWITTER_ACCESS_TOKEN')
+access_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 
 def wrtite_to_csv(screen_name, alltweets):

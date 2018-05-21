@@ -5,10 +5,11 @@ from django.db import models
 
 class Tweet(models.Model):
     tweet_id = models.CharField(max_length=30)
-    text = models.CharField(max_length=140)
-    created_at = models.DateField()
+    text = models.CharField(max_length=200)
+    created_at = models.CharField(null=True, max_length=30)
+    collected_at = models.DateField()
     sentiment = models.ForeignKey('Sentiment', null=True, on_delete=models.SET_NULL)
-    sent_accuracy = models.FloatField()
+    sent_accuracy = models.FloatField(null=True)
 
     def __str__(self):
         return self.text

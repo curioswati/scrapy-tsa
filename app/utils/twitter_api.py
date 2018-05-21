@@ -3,11 +3,14 @@ import json
 import oauth2
 import urllib
 
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from app.models import Tweet
+from app.utils.classifier import NBClassifier
 from django.conf import settings
 
 
-def make_api_request(self, url, http_method="GET", post_body=None, http_headers=None):
+def make_api_request(url, http_method="GET", post_body=None, http_headers=None):
     '''
     Make API request to get tweets.
     '''
@@ -30,13 +33,8 @@ def get_tweets(keyword, params={}):
     '''
     maxTweets = 50
     url = settings.TWITTER_API_URL
-    data = {'q': keyword, 'lang': 'en', 'result_type': 'recent',
+    data = {'q': keyword, 'lang': 'en',
             'count': maxTweets, 'include_entities': 0}
-
-    # Add if additional params are passed
-    if params:
-        for key, value in params.iteritems():
-            data[key] = value
 
     url += urllib.urlencode(data)
 
@@ -48,7 +46,7 @@ def get_tweets(keyword, params={}):
         print "API Error:\n{}".format(json_data['errors'])
     else:
         for item in json_data['statuses']:
-            tweets.append((item['created_at'], item['text']))
+            tweets.append((item['id_str'], item['created_at'], item['text']))
     return tweets
 
 
@@ -72,40 +70,23 @@ def get_bundled_tweets(keyword, from_date, to_date):
     params = {'since': from_date, 'until': to_date}
     tweets_data = get_tweets(keyword, params)
 
-    # test data
-    # tweets_data = [('Sun Nov 23 23:40:54 +0000 2017', 'Aggressive Ponytail #freebandnames'),
-    #                ('Sat Nov 22 23:40:54 +0000 2017', 'Aggressive #freebandnames'),
-    #                ('Sun Nov 23 23:40:54 +0000 2017', 'Aggressive in the fg one'),
-    #                ('Sat Nov 22 23:40:54 +0000 2017', 'Aggressive in the hello one')]
-
     # this will be the final output data structure
     tweet_bundle = {}
 
-    for created_at_str, tweet in tweets_data:
+    for tweet_id, created_at_str, tweet in tweets_data:
         # split and collect the date from created_at string.
         date_parts = created_at_str.split()
         date_str = ' '.join(date_parts[1:3] + date_parts[-1:-2:-1])
-        formatted_date = datetime.strftime(datetime.strptime(date_str, '%b %d %Y'), date_format)
+        date = datetime.strptime(date_str, '%b %d %Y')
+        formatted_date = datetime.strftime(date, date_format)
 
         # assign the tweet to date in the output DS.
         if formatted_date in tweet_bundle:
             tweet_bundle[formatted_date].append(tweet)
         else:
             tweet_bundle[formatted_date] = [tweet]
-
-    # save the tweets to files according to date of creation.
-    cur_date = from_date
-    day_diff = timedelta(days=1)
-
-    while cur_date <= to_date:
-        date_str = datetime.strftime(cur_date, date_format)
-        file_name = 'app/data/tweets_{}.txt'.format(date_str)
-
-        with open(file_name, 'w') as day_tweet_file:
-            for tweet in tweet_bundle.get(date_str, []):
-                day_tweet_file.write('{}\n'.format(tweet))
-
-        cur_date += day_diff
+        tweet = Tweet.objects.create(tweet_id=tweet_id, text=tweet, created_at=created_at_str, collected_at=date)
+        tweet.save()
 
     return tweet_bundle
 
@@ -139,6 +120,10 @@ def get_twitter_data(keyword, from_date, to_date):
         if tweets:
             tweets_data[date_str] = tweets
             cur_date += day_diff
+        else:
+            tweet_bundle = get_bundled_tweets(keyword, cur_date, to_date)
+            tweets_data.update(tweet_bundle)
+            break
     return tweets_data
 
 

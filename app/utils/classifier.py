@@ -212,7 +212,9 @@ class NBClassifier(BaseClassifier):
         return classifier
 
     def classify(self, data):
-        results = []
+        results = [{'key': 'Positive', 'values':[]},
+                   {'key': 'Neutral', 'values':[]},
+                   {'key': 'Neutral', 'values':[]}]
 
         pos_count = neg_count = neut_count = 0
 
@@ -230,8 +232,11 @@ class NBClassifier(BaseClassifier):
                     neg_count += 1
                 elif label == 'neutral':
                     neut_count += 1
-            results.append([date, neg_count, neut_count, pos_count])
+            results[0]['values'].append({'label': date, 'value': pos_count})
+            results[1]['values'].append({'label': date, 'value': neut_count})
+            results[2]['values'].append({'label': date, 'value': neg_count})
             pos_count = neg_count = neut_count = 0
+        print results
         return results
 
     def accuracy(self):

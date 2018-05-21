@@ -24,3 +24,6 @@ svg {
     font-size: 16px;
     fill: white;
 }
+header {
+    background-image: none !important;
+}

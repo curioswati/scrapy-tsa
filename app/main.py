@@ -1,29 +1,33 @@
-from utils import classifier, twitter_api
+import pickle
+import sys
 
-# Read the tweets one by one and process it
-# inp_tweets = csv.reader(open('app/data/sampleTweets.csv', 'rb'), delimiter=',', quotechar='|')
-# fp = open('app/data/sampleTweets.txt', 'r')
-# line = fp.readline()
-
-stop_words = common.get_stop_wordlist('app/data/stopwords.txt')
-
-# tweets = []
-feature_list = []
-#
-# for row in inp_tweets:
-#     sentiment = row[0]
-#     tweet = row[1]
-#     processed_tweet = common.process_tweet(tweet)
-#     feature_vector = common.get_feature_vector(processed_tweet, stop_words)
-#     feature_list.extend(feature_vector)
-#     tweets.append((feature_vector, sentiment))
-#
-feature_list = list(set(feature_list))
+from app.utils.classifier import SVMClassifier
 
 
-def extract_features(tweet):
-    tweet_words = set(tweet)
-    features = {}
-    for word in feature_list:
-        features['contains(%s)' % word] = (word in tweet_words)
-    return features
+def train_model(test_tweets_file):
+    '''
+    This function trains the svm classifier using the training data.
+    '''
+    training_datafile = 'app/data/training.csv'
+    svm_classifier_dumpfile = 'app/data/svm_trained_model.pickle'
+
+    sys.stdout.flush()
+    sc = SVMClassifier(training_datafile, svm_classifier_dumpfile, training_required=1)
+
+    # get tweets from file
+    tweets_file = open(test_tweets_file)
+    tweets = pickle.load(tweets_file)
+    tweets_file.close()
+
+    print 'Classifying'
+    sys.stdout.flush()
+    results = sc.classify(tweets)
+
+    for key in results:
+        for item in results[key]:
+            print results[key][item]
+
+    print 'Computing Accuracy'
+    sc.accuracy()
+    print 'Done'
+    sys.stdout.flush()
