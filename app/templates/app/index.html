@@ -1,0 +1,24 @@
+{% extends 'app/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Analyse Your User's tweets!{% endblock %}
+
+{% block header %}
+<div class="header-content">
+  <div class="header-content-inner">
+    <!-- <h1 id="homeHeading">Your Favorite Source of Analysing your Tweets</h1> -->
+    <h1 id="homeHeading">Get insights from your Users' tweets!</h1>
+    <hr>
+    <p>ScrapyTSA can help you classify the twitter talks about your product!</p>
+    <!-- <a href="#about" class="btn btn-primary btn-xl page-scroll">Find Out More</a> -->
+    <form role="form" action="/result" method="POST">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder=" Enter the keyword/product name you want to perform the analysis for. Example - scrapy" autofocus>
+            <span class="input-group-btn">
+                <button class="btn btn-warning" type="submit">Get Results!</button>
+            </span>
+        </div><!-- /input-group -->
+    </form>
+  </div>
+</div>
+{% endblock %}

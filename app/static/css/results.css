@@ -1,0 +1,26 @@
+form {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+label {
+  display: block;
+}
+
+svg {
+  margin: 80px 20px;
+}
+
+.axis text {
+    font-weight: bold;
+    fill: white;
+}
+.axis line, .axis path {
+    stroke: white;
+}
+.label {
+    font-size: 16px;
+    fill: white;
+}

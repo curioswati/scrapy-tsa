@@ -1,0 +1,17 @@
+{% extends 'app/base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="static/css/results.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}Results{% endblock %}
+
+{% block header %}
+<meta id="result" data-result="{{data}}">
+<svg width="960" height="500"></svg>
+{% endblock %}
+
+{% block js %}
+    <script src="static/js/results.js" type="text/javascript"></script>
+{% endblock %}
